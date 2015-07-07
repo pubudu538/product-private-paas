@@ -29,6 +29,14 @@ if [ ${START_CMD} = 'PCA' ]; then
 	echo "Python cartridge agent started successfully"
 else
     echo "Configuring Hadoop..."
+    echo ${CLUSTER}
+    echo "clustering true or not"
+    if [ ${CLUSTER} = 'true' ]; then
+          ip=`ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'`
+          export CONFIG_PARAM_HADOOP_MASTER=${ip}
+	echo ${ip}
+	echo "came insideppppppp"
+    fi    
     echo "Environment variables:"
     printenv
     pushd ${CONFIGURATOR_HOME}
@@ -37,8 +45,8 @@ else
     echo "Hadoop configured successfully"
     
     echo "Starting Hadoop..."
-    ${HADOOP_HOME}/bin/hadoop namenode -format
-    ${HADOOP_HOME}/sbin/start-all.sh
+#    ${HADOOP_HOME}/bin/hadoop namenode -format
+#    ${HADOOP_HOME}/sbin/start-all.sh
 	
     echo "Hadoop started successfully"
 fi

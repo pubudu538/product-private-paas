@@ -16,7 +16,9 @@
 # under the License.
 
 JAVA_HOME=$1
-CARBON_HOME=$2
+HADOOP_HOME=$2
 
 echo "JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 echo "HADOOP_HOME=${HADOOP_HOME}" >> /etc/environment
+echo ""
+ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'

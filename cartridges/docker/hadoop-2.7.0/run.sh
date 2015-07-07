@@ -20,27 +20,27 @@
 #
 # --------------------------------------------------------------
 
-# Start an IS cluster with docker
+# Start an Hadoop cluster with docker
 memberId=1
 startWkaMember() {
-	name="wso2is-${memberId}-wka"
-	container_id=`docker run -e CONFIG_PARAM_CLUSTERING=true -d -P --name ${name} wso2/is:5.0.0`
+	name="hadoop-${memberId}"
+	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER=localhost -e CLUSTER=true -d -P --name ${name} wso2/hadoop:2.7.0`
 	memberId=$((memberId + 1))
 	wka_member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
-	echo "IS wka member started: [name] ${name} [ip] ${wka_member_ip} [container-id] ${container_id}"
+	echo "Hadoop Master started: [name] ${name} [ip] ${wka_member_ip} [container-id] ${container_id}"
 	sleep 1
 }
 
 startMember() {
-	name="wso2is-${memberId}"
-	container_id=`docker run -e CONFIG_PARAM_CLUSTERING=true -e CONFIG_PARAM_WKA_MEMBERS="${wka_member_ip}:4000" -d -P --name ${name} wso2/is:5.0.0`
+	name="hadoop-${memberId}"
+	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER="${wka_member_ip}" -d -P --name ${name} wso2/hadoop:2.7.0`
 	memberId=$((memberId + 1))
 	member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
-	echo "IS member started: [name] ${name} [ip] ${member_ip} [container-id] ${container_id}"
+	echo "Hadoop datanode started: [name] ${name} [ip] ${member_ip} [container-id] ${container_id}"
 	sleep 1
 }
 
-echo "Starting an IS cluster with docker..."
+echo "Starting an Hadoop cluster with docker..."
 startWkaMember
 startMember
 startMember

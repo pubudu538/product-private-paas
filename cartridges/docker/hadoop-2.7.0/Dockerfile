@@ -26,7 +26,8 @@ USER root
 RUN ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
 RUN cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
 ADD ssh_config /root/.ssh/config
-
+RUN ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa 
+RUN cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 #RUN ssh -o "StrictHostKeyChecking no" USER@host
 
 #RUN rm -f /etc/ssh/ssh_host_dsa_key
@@ -49,6 +50,7 @@ ENV HADOOP_TEMPLATE_MODULE_NAME hadoop-${HADOOP_VERSION}-template-module-${PPAAS
 ENV HADOOP_HOME /opt/hadoop-${HADOOP_VERSION}
 ENV PCA_NAME apache-stratos-python-cartridge-agent-${PPAAS_VERSION}
 ENV PCA_HOME /opt/${PCA_NAME}
+ENV CONFIG_PARAM_HADOOP_MASTER localhost
 
 # --------------------------------
 # Copy scripts, packages & plugins
@@ -88,6 +90,8 @@ RUN unzip /opt/${CONFIGURATOR_NAME}.zip -d /opt/ && \
 
 # HADOOP htts port
 EXPOSE 50070
+EXPOSE 54310
+EXPOSE 54311
 # -------------------------------
 # Define entry point & start sshd
 # -------------------------------
