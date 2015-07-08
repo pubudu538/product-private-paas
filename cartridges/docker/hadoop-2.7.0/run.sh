@@ -36,11 +36,12 @@ startMember() {
 	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER="${wka_member_ip}" -d -P --name ${name} wso2/hadoop:2.7.0`
 	memberId=$((memberId + 1))
 	member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
-	echo "Hadoop datanode started: [name] ${name} [ip] ${member_ip} [container-id] ${container_id}"
+	echo "Hadoop Datanode started: [name] ${name} [ip] ${member_ip} [container-id] ${container_id}"
 	sleep 1
 }
 
 echo "Starting an Hadoop cluster with docker..."
 startWkaMember
+startMember
 startMember
 startMember

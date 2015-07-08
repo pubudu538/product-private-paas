@@ -31,22 +31,36 @@ else
     echo "Configuring Hadoop..."
     echo ${CLUSTER}
     echo "clustering true or not"
+
     if [ ${CLUSTER} = 'true' ]; then
+	sleep 3
           ip=`ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'`
           export CONFIG_PARAM_HADOOP_MASTER=${ip}
 	echo ${ip}
 	echo "came insideppppppp"
-    fi    
+        echo "Environment variables:"
+        printenv
+        pushd ${CONFIGURATOR_HOME}
+        python configurator.py
+        popd
+        echo "Hadoop Namenode configured successfully"
+    
+        echo "Starting Hadoop Namenode..."
+        ${HADOOP_HOME}/bin/hadoop namenode -format
+        ${HADOOP_HOME}/sbin/start-all.sh
+	echo "Hadoop Namenode started successfully"
+    else
+
     echo "Environment variables:"
     printenv
     pushd ${CONFIGURATOR_HOME}
     python configurator.py
     popd
-    echo "Hadoop configured successfully"
+    echo "Hadoop Datanode configured successfully"
     
     echo "Starting Hadoop..."
-#    ${HADOOP_HOME}/bin/hadoop namenode -format
-#    ${HADOOP_HOME}/sbin/start-all.sh
-	
-    echo "Hadoop started successfully"
+    ${HADOOP_HOME}/sbin/hadoop-daemon.sh start datanode
+    echo "Hadoop Datanode started successfully"
+
+    fi    
 fi

@@ -16,7 +16,7 @@
 
 <!-- Put site-specific property overrides in this file. -->
 <configuration>
- <property> 
+   <property> 
       <name>dfs.data.dir</name> 
       <value>/opt/hdfs/datanode</value> 
       <final>true</final> 
@@ -33,6 +33,11 @@
    <property>
   <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
   <value>false</value>
+  </property>
+  <property>
+ <name>dfs.namenode.heartbeat.recheck-interval</name>
+ <value>5000</value>
+ <description>Determines expired datanodes in miliseconds.</description>
 </property>
 </configuration>
 

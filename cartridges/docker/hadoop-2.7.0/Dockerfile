@@ -26,17 +26,6 @@ USER root
 RUN ssh-keygen -t dsa -P '' -f ~/.ssh/id_dsa
 RUN cat ~/.ssh/id_dsa.pub >> ~/.ssh/authorized_keys
 ADD ssh_config /root/.ssh/config
-RUN ssh-keygen -t rsa -P '' -f $HOME/.ssh/id_rsa 
-RUN cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
-#RUN ssh -o "StrictHostKeyChecking no" USER@host
-
-#RUN rm -f /etc/ssh/ssh_host_dsa_key
-#RUN rm -f /etc/ssh/ssh_host_rsa_key
-#RUN ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key
-#RUN ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key
-#RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa
-#RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
-
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV PPAAS_VERSION 4.1.0-SNAPSHOT
@@ -44,7 +33,6 @@ ENV JDK_VERSION 1.7.0_79
 ENV JDK_TAR_FILENAME jdk-7u79-linux-x64.tar.gz
 ENV JAVA_HOME /opt/jdk${JDK_VERSION}
 ENV CONFIGURATOR_NAME ppaas-configurator-${PPAAS_VERSION}
-ENV CONFIGURATOR_HOME /opt/${CONFIGURATOR_NAME}
 ENV HADOOP_VERSION 2.7.0
 ENV HADOOP_TEMPLATE_MODULE_NAME hadoop-${HADOOP_VERSION}-template-module-${PPAAS_VERSION}
 ENV HADOOP_HOME /opt/hadoop-${HADOOP_VERSION}
@@ -58,7 +46,6 @@ ENV CONFIG_PARAM_HADOOP_MASTER localhost
 ADD packages/${JDK_TAR_FILENAME} /opt/
 COPY scripts/init.sh /usr/local/bin/init.sh
 COPY scripts/export-envs.sh /tmp/export-envs.sh
-COPY packages/${CONFIGURATOR_NAME}.zip /opt/
 COPY packages/${HADOOP_TEMPLATE_MODULE_NAME}.zip /opt/
 ADD packages/hadoop-${HADOOP_VERSION}.tar.gz /opt/
 COPY plugins /${PCA_HOME}/plugins
@@ -75,9 +62,7 @@ RUN chmod 750 /opt/hdfs/namenode
 RUN mkdir -p /opt/hdfs/datanode
 RUN chmod 750 /opt/hdfs/datanode
 
-RUN unzip /opt/${CONFIGURATOR_NAME}.zip -d /opt/ && \
-    rm /opt/${CONFIGURATOR_NAME}.zip && \
-    unzip /opt/${HADOOP_TEMPLATE_MODULE_NAME}.zip -d /opt/${CONFIGURATOR_NAME}/template-modules/ && \
+RUN unzip /opt/${HADOOP_TEMPLATE_MODULE_NAME}.zip -d /opt/${CONFIGURATOR_NAME}/template-modules/ && \
     rm /opt/${HADOOP_TEMPLATE_MODULE_NAME}.zip && \
     pip install jinja2 && \
     chmod +x /tmp/export-envs.sh && \
