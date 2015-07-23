@@ -20,29 +20,8 @@
 #
 # --------------------------------------------------------------
 
-set -e
-prgdir=`dirname "$0"`
-script_path=`cd "$prgdir"; pwd`
+# run script sets the configurable parameters for the cartridge agent in agent.conf and
+# starts the cartridge agent process.
 
-project_version="4.1.0"
-configurator_path=`cd ${script_path}/../../../components/org.wso2.ppaas.configurator/; pwd`
-clean=false
-if [ "$1" = "clean" ]; then
-   clean=true
-fi
-
-if ${clean} ; then
-   echo "----------------------------------"
-   echo "Building configurator"
-   echo "----------------------------------"
-   pushd ${configurator_path}
-   mvn clean install                                                                                      
-   cp -v target/ppaas-configurator-${project_version}.zip ${script_path}/packages/
-   popd
-fi
-
-echo "----------------------------------"
-echo "Building base docker image"
-echo "----------------------------------"
-docker build -t wso2/base-image:4.1.0 .
-echo "Base docker image built successfully"
+echo $1   $2 >> /etc/hosts
+echo $2 >> ${HBASE_HOME}/conf/regionservers

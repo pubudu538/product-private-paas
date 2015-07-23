@@ -25,8 +25,8 @@ MAINTAINER dev@wso2.org
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV PPAAS_VERSION 4.1.0-SNAPSHOT
-ENV JDK_VERSION 1.7.0_60
-ENV JDK_TAR_FILENAME jdk-7u60-linux-x64.tar.gz
+ENV JDK_VERSION 1.7.0_72
+ENV JDK_TAR_FILENAME jdk-7u72-linux-x64.tar.gz
 ENV JAVA_HOME /opt/jdk${JDK_VERSION}
 ENV CARBON_HOME /opt/zookeeper-3.4.6
 ENV PCA_NAME apache-stratos-python-cartridge-agent-${PPAAS_VERSION}

@@ -23,15 +23,16 @@ FROM debian:7.7
 MAINTAINER dev@wso2.org
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV PCA_FILENAME apache-stratos-python-cartridge-agent-4.1.0-SNAPSHOT
+ENV PCA_NAME apache-stratos-python-cartridge-agent-4.1.0
 
 #JDK and configurator
-ENV JDK_VERSION 1.7.0_60
+ENV JDK_VERSION 1.7.0_72
 ENV PPAAS_VERSION 4.1.0-SNAPSHOT
-ENV JDK_TAR_FILENAME jdk-7u60-linux-x64.tar.gz
+ENV JDK_TAR_FILENAME jdk-7u72-linux-x64.gz
 ENV JAVA_HOME /opt/jdk${JDK_VERSION}
 ENV CONFIGURATOR_NAME ppaas-configurator-${PPAAS_VERSION}
 ENV CONFIGURATOR_HOME /opt/${CONFIGURATOR_NAME}
+ENV PCA_HOME /opt/${PCA_NAME}
 
 WORKDIR /opt/
 
@@ -46,7 +47,9 @@ RUN apt-get update && apt-get install -y \
 		python-pip \ 
 		python-dev gcc \
 		zip \
-		stress
+		stress \
+		nano
+# nano tool is added for development purposes
 # stress tool is added for demo purposes
 
 RUN mkdir -p /var/run/sshd
@@ -72,12 +75,12 @@ RUN pip install jinja2 \
 ADD  packages/${JDK_TAR_FILENAME} /opt/
 COPY packages/${CONFIGURATOR_NAME}.zip /opt/
 COPY scripts/start-agent.sh /usr/local/bin/start-agent.sh
-COPY packages/${PCA_FILENAME}.zip /opt/${PCA_FILENAME}.zip
+COPY packages/${PCA_NAME}.zip /opt/${PCA_NAME}.zip
 
-RUN unzip -q /opt/${PCA_FILENAME}.zip && \
-    rm /opt/${PCA_FILENAME}.zip && \
-    mkdir -p /opt/${PCA_FILENAME}/payload && \
-    chmod +x /opt/${PCA_FILENAME}/extensions/bash/* && \
+RUN unzip -q /opt/${PCA_NAME}.zip && \
+    rm /opt/${PCA_NAME}.zip && \
+    mkdir -p /opt/${PCA_NAME}/payload && \
+    chmod +x /opt/${PCA_NAME}/extensions/bash/* && \
     unzip /opt/${CONFIGURATOR_NAME}.zip -d /opt/ && \
     rm /opt/${CONFIGURATOR_NAME}.zip && \
     mkdir -p /var/log/apache-stratos && \

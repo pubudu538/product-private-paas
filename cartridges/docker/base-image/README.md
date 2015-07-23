@@ -6,7 +6,7 @@ WSO2 products base image Dockerfile defines required resources for building a Do
 
 (1) Copy following files to the packages folder:
 ```
-apache-stratos-python-cartridge-agent-4.1.0-SNAPSHOT.zip
+apache-stratos-python-cartridge-agent-4.1.0.zip
 jdk-7u60-linux-x64.tar
 ppaas-configurator-<version>.zip
 ```

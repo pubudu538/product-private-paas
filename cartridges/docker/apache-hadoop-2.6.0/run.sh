@@ -20,29 +20,28 @@
 #
 # --------------------------------------------------------------
 
-set -e
-prgdir=`dirname "$0"`
-script_path=`cd "$prgdir"; pwd`
+# Start an Hadoop cluster with docker
+memberId=1
+startWkaMember() {
+	name="hadoop-${memberId}"
+	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER=localhost -e CLUSTER=true -d -P --name ${name} wso2/hadoop:2.6.0`
+	memberId=$((memberId + 1))
+	wka_member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
+	echo "Hadoop Master started: [name] ${name} [ip] ${wka_member_ip} [container-id] ${container_id}"
+	sleep 1
+}
 
-project_version="4.1.0"
-configurator_path=`cd ${script_path}/../../../components/org.wso2.ppaas.configurator/; pwd`
-clean=false
-if [ "$1" = "clean" ]; then
-   clean=true
-fi
+startMember() {
+	name="hadoop-${memberId}"
+	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER="${wka_member_ip}" -d -P --name ${name} wso2/hadoop:2.6.0`
+	memberId=$((memberId + 1))
+	member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
+	echo "Hadoop Datanode started: [name] ${name} [ip] ${member_ip} [container-id] ${container_id}"
+	sleep 1
+}
 
-if ${clean} ; then
-   echo "----------------------------------"
-   echo "Building configurator"
-   echo "----------------------------------"
-   pushd ${configurator_path}
-   mvn clean install                                                                                      
-   cp -v target/ppaas-configurator-${project_version}.zip ${script_path}/packages/
-   popd
-fi
-
-echo "----------------------------------"
-echo "Building base docker image"
-echo "----------------------------------"
-docker build -t wso2/base-image:4.1.0 .
-echo "Base docker image built successfully"
+echo "Starting an Hadoop cluster with docker..."
+startWkaMember
+startMember
+#startMember
+#startMember
