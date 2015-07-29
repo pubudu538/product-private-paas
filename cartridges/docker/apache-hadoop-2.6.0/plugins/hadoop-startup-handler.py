@@ -47,7 +47,12 @@ class HadoopStartupHandler(ICartridgeAgentPlugin):
             p = subprocess.Popen(format_namenode_command, env=env_var, shell=True)
             output, errors = p.communicate()
 
-            start_command = "exec ${HADOOP_HOME}/sbin/start-all.sh"
+            start_command = "exec ${HADOOP_HOME}/sbin/start-dfs.sh"
+            env_var = os.environ.copy()
+            p = subprocess.Popen(start_command, env=env_var, shell=True)
+            output, errors = p.communicate()
+
+            start_command = "exec ${HADOOP_HOME}/sbin/start-yarn.sh"
             env_var = os.environ.copy()
             p = subprocess.Popen(start_command, env=env_var, shell=True)
             output, errors = p.communicate()

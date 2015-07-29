@@ -44,6 +44,7 @@ ENV CONFIGURATOR_HOME /opt/${CONFIGURATOR_NAME}
 
 COPY scripts/init.sh /usr/local/bin/init.sh
 COPY scripts/export-envs.sh /tmp/export-envs.sh
+COPY scripts/add-host.sh /tmp/add-host.sh
 COPY packages/${HADOOP_TEMPLATE_MODULE_NAME}.zip /opt/
 ADD packages/hadoop-${HADOOP_VERSION}.tar.gz /opt/
 COPY plugins /${PCA_HOME}/plugins
@@ -54,11 +55,8 @@ COPY plugins /${PCA_HOME}/plugins
 WORKDIR /opt
 
 RUN mkdir -p /app/hadoop/tmp
-RUN chmod 750 /app/hadoop/tmp
-RUN mkdir -p /opt/hdfs/namenode
-RUN chmod 750 /opt/hdfs/namenode
-RUN mkdir -p /opt/hdfs/datanode
-RUN chmod 750 /opt/hdfs/datanode
+RUN chown -R root /app/hadoop/tmp
+RUN chown -R root ${HADOOP_HOME}
 
 RUN unzip /opt/${HADOOP_TEMPLATE_MODULE_NAME}.zip -d /opt/${CONFIGURATOR_NAME}/template-modules/ && \
     rm /opt/${HADOOP_TEMPLATE_MODULE_NAME}.zip && \
@@ -76,6 +74,8 @@ EXPOSE 54310
 EXPOSE 54311
 EXPOSE 50075
 EXPOSE 50010
+EXPOSE 50020
+EXPOSE 50090
 # -------------------------------
 # Define entry point & start sshd
 # -------------------------------

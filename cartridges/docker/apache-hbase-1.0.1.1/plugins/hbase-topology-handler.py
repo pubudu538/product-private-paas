@@ -32,8 +32,6 @@ class HbaseTopologyHandler(ICartridgeAgentPlugin):
 
         if mds_response is not None and mds_response.properties.get(key) is not None:
             read_data = mds_response.properties[key]
-            log.info(read_data)
-
             check_str=isinstance(read_data, (str, unicode))
 
             if check_str == True:
@@ -107,20 +105,6 @@ class HbaseTopologyHandler(ICartridgeAgentPlugin):
 
 
         if clustering_enable == 'true':
-
-            # mds_response = mdsclient.get(app=True)
-            #
-            # if mds_response is not None and mds_response.properties.get("CONFIG_PARAM_HBASE_MASTER_HOSTNAME") is not None:
-            #     master_hostname_old = mds_response.properties["CONFIG_PARAM_HBASE_MASTER_HOSTNAME"]
-            #     log.info(master_hostname_old)
-            #
-            #     check_str=isinstance(master_hostname_old, (str, unicode))
-            #
-            #     if check_str == True:
-            #         mdsclient.delete_property_value("CONFIG_PARAM_HBASE_MASTER_HOSTNAME",master_hostname_old)
-            #     else:
-            #         for entry in master_hostname_old:
-            #             mdsclient.delete_property_value("CONFIG_PARAM_HBASE_MASTER_HOSTNAME",entry)
 
             self.remove_data_from_metadata("CONFIG_PARAM_HBASE_MASTER_HOSTNAME")
             self.remove_data_from_metadata("CONFIG_PARAM_HBASE_REGIONSERVER_DATA")

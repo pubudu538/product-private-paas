@@ -31,14 +31,12 @@ class HbaseStartupHandler(ICartridgeAgentPlugin):
         log.info(clustering_enable)
 
         configured= os.environ.get('CONFIGURED')
-        log.info("Check -1")
         log.info(configured)
 
         while configured is not 'true':
             time.sleep(5)
             configured = os.environ.get('CONFIGURED')
             log.info(configured)
-            log.info("Check -2")
             log.info("####### Waiting for configurations #############")
 
         if clustering_enable == 'true':

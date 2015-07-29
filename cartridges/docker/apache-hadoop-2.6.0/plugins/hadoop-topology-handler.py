@@ -20,6 +20,7 @@ from plugins.contracts import ICartridgeAgentPlugin
 from modules.util.log import LogFactory
 import subprocess
 import os
+import socket
 
 class HadoopTopologyHandler(ICartridgeAgentPlugin):
 
@@ -50,6 +51,20 @@ class HadoopTopologyHandler(ICartridgeAgentPlugin):
                                     os.environ["CONFIG_PARAM_HADOOP_MASTER"] = master_ip
 
         log.info("Configured master ip - "+master_ip)
+
+        clustering_enable= os.environ.get('CLUSTER')
+
+        if clustering_enable != 'true':
+
+            server_hostname=socket.gethostname()
+            server_ip=socket.gethostbyname(server_hostname)
+
+            add_host_command = "ssh root@"+master_ip+" 'bash -s' < /tmp/add-host.sh "+server_ip+" "+server_hostname
+            env_var = os.environ.copy()
+            p = subprocess.Popen(add_host_command, env=env_var, shell=True)
+            output, errors = p.communicate()
+            log.info("Entry added to Hadoop master /etc/hosts")
+
 
         # configure server
         log.info("Configuring Hadoop...")

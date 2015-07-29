@@ -46,8 +46,10 @@ else
     
         echo "Starting Hadoop Namenode..."
         ${HADOOP_HOME}/bin/hadoop namenode -format
-        ${HADOOP_HOME}/sbin/start-all.sh
-	    echo "Hadoop Namenode started successfully"
+        ${HADOOP_HOME}/sbin/start-dfs.sh
+        ${HADOOP_HOME}/sbin/start-yarn.sh
+        echo "Hadoop Namenode started successfully"
+
     else
 
     echo "Environment variables:"
@@ -56,6 +58,15 @@ else
     python configurator.py
     popd
     echo "Hadoop Datanode configured successfully"
+
+    sleep 3
+    ip=`ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'`
+    echo ${ip}
+    echo ${HOSTNAME}
+    ssh root@${CONFIG_PARAM_HADOOP_MASTER} 'bash -s' < /tmp/add-host.sh ${ip} ${HOSTNAME}
+    echo ${CONFIG_PARAM_HADOOP_MASTER}
+    echo ${ip}
+    echo ${HOSTNAME}
     
     echo "Starting Hadoop..."
     ${HADOOP_HOME}/sbin/hadoop-daemon.sh start datanode

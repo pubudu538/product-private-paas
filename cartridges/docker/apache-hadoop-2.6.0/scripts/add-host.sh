@@ -20,28 +20,8 @@
 #
 # --------------------------------------------------------------
 
-# Start an Hadoop cluster with docker
-memberId=1
-startWkaMember() {
-	name="hadoop-${memberId}"
-	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER=localhost -e CLUSTER=true -d -P --name ${name} wso2/hadoop:2.6.0`
-	memberId=$((memberId + 1))
-	wka_member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
-	echo "Hadoop Master started: [name] ${name} [ip] ${wka_member_ip} [container-id] ${container_id}"
-	sleep 1
-}
+# run script sets the configurable parameters for the cartridge agent in agent.conf and
+# starts the cartridge agent process.
 
-startMember() {
-	name="hadoop-${memberId}"
-	container_id=`docker run -e CONFIG_PARAM_HADOOP_MASTER="${wka_member_ip}" -d -P --name ${name} wso2/hadoop:2.6.0`
-	memberId=$((memberId + 1))
-	member_ip=`docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${container_id}`
-	echo "Hadoop Datanode started: [name] ${name} [ip] ${member_ip} [container-id] ${container_id}"
-	sleep 1
-}
-
-echo "Starting an Hadoop cluster with docker..."
-startWkaMember
-startMember
-startMember
-startMember
+echo $1   $2 >> /etc/hosts
+echo $2 >> ${HADOOP_HOME}/etc/hadoop/slaves

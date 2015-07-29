@@ -18,22 +18,18 @@
 <configuration>
    <property> 
       <name>dfs.data.dir</name> 
-      <value>/opt/hdfs/datanode</value> 
+      <value>file:///opt/hadoop-2.6.0/hadoop/dfs/name/data</value>
       <final>true</final> 
    </property> 
    <property> 
       <name>dfs.name.dir</name> 
-      <value>/opt/hdfs/namenode</value> 
+      <value>file:///opt/hadoop-2.6.0/hadoop/dfs/name</value>
       <final>true</final> 
    </property> 
    <property> 
       <name>dfs.replication</name> 
       <value>3</value>
-   </property> 
-   <property>
-  <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
-  <value>false</value>
-  </property>
+   </property>
   <property>
  <name>dfs.namenode.heartbeat.recheck-interval</name>
  <value>5000</value>
