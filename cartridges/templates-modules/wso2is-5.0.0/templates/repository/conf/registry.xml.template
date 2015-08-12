@@ -41,11 +41,7 @@
     <remoteInstance url="https://localhost:9443/registry">
         <id>instanceid</id>
         <dbConfig>sharedregistry</dbConfig>
-        {% if CONFIG_PARAM_SUB_DOMAIN == 'mgt' -%}
-            <readOnly>false</readOnly>
-        {% else -%}
-            <readOnly>true</readOnly>
-        {%  endif -%}
+        <readOnly>false</readOnly>
         <enableCache>true</enableCache>
         <registryRoot>/</registryRoot>
         <cacheId>{{CONFIG_PARAM_USER_NAME}}@{{CONFIG_PARAM_URL}}{{dbName}}?autoReconnect=true</cacheId>

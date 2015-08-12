@@ -1,10 +1,10 @@
-WSO2-IS 5.0.0 Template for the Configurator
+WSO2-AM 1.9.0 Template for the Configurator
 -------------------------------------------------------------------------------------
 
 This template supports following configurations
 
-1. Clustering IS
-2. Fronting the IS cluster with WSO2 ELB
+1. Clustering AM
+2. Fronting the AM cluster with WSO2 ELB
 
 Following are the configuration parameters that is used by the template.
 You can configure following in the ***module.ini*** file.
@@ -19,7 +19,7 @@ You can configure following in the ***module.ini*** file.
 
 #### Set the path of product directory :
 
-    CARBON_HOME = <IS_HOME>
+    CARBON_HOME = <AM_HOME>
 
 ---
 
@@ -27,7 +27,7 @@ You can configure following in the ***module.ini*** file.
 
     CONFIG_PARAM_CLUSTERING = true
 
-* Used in - < IS_HOME >/repository/conf/axis2/axis2.xml
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
 
 ---
 
@@ -35,7 +35,7 @@ You can configure following in the ***module.ini*** file.
 
     CONFIG_PARAM_MEMBERSHIP_SCHEME = wka
 
-* Used in - < IS_HOME >/repository/conf/axis2/axis2.xml
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
 
 ---
         
@@ -43,7 +43,7 @@ You can configure following in the ***module.ini*** file.
 
     CONFIG_PARAM_DOMAIN = wso2.am.domain
 
-* Used in - < IS_HOME >/repository/conf/axis2/axis2.xml
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
 
 ---
 
@@ -52,7 +52,7 @@ You can configure following in the ***module.ini*** file.
     CONFIG_PARAM_WKA_MEMBERS = "127.0.0.1:4000,127.0.1.1:4001"
 
 * Format - "ip_address1:port1,ip_address2:port2"
-* Used in - < IS_HOME >/repository/conf/axis2/axis2.xml
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
 
 ---
 
@@ -61,7 +61,7 @@ You can configure following in the ***module.ini*** file.
     CONFIG_PARAM_LOCAL_MEMBER_HOST = 127.0.0.1
     CONFIG_PARAM_LOCAL_MEMBER_PORT = 4000
 
-* Used in - < IS_HOME >/repository/conf/axis2/axis2.xml
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
 
 ---
 
@@ -69,7 +69,7 @@ You can configure following in the ***module.ini*** file.
 
     CONFIG_PARAM_PORT_OFFSET = 0
 
-* Used in - < IS_HOME >/repository/conf/carbon.xml
+* Used in - < AM_HOME >/repository/conf/carbon.xml
 
 ---
 #### Set proxy ports when using a load balancer :
@@ -77,25 +77,37 @@ You can configure following in the ***module.ini*** file.
     CONFIG_PARAM_HTTP_PROXY_PORT = 80
     CONFIG_PARAM_HTTPS_PROXY_PORT = 443
 
-* Used in - < IS_HOME >/repository/conf/tomcat/catalina-server.xml
+* Used in - < AM_HOME >/repository/conf/tomcat/catalina-server.xml
+
+---
+#### Set port mapping in manager Nodes :
+
+    CONFIG_PARAM_PT_HTTP_PROXY_PORT  = 80
+    CONFIG_PARAM_PT_HTTPS_PROXY_PORT  = 443
+
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
+
+---
+#### Set worker/manger sub-domain in nodes  :
+
+    CONFIG_PARAM_SUB_DOMAIN= worker
+
+ * Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
+ * Used in - < AM_HOME >/repository/conf/carbon.xml
+ * Used in - < AM_HOME >/repository/conf/registry.xml
+
+---
+#### Set worker and manager hostnames
+
+    CONFIG_PARAM_WORKER_HOST_NAME = am.cloud-test.wso2.com
+    CONFIG_PARAM_MGT_HOST_NAME = mgt.am.cloud-test.wso2.com
+
+* Used in - < AM_HOME >/repository/conf/axis2/axis2.xml
+* Used in - < AM_HOME >/repository/conf/carbon.xml
 
 ---
 
-#### Enable Embedded LDAP
-
-    CONFIG_PARAM_EMBEDDED_LDAP = true
-
-* Used in - <IS_HOME>/repository/conf/embedded-ldap.xml
-
----
-#### Set LDAP Connection URL
-
-    CONFIG_PARAM_LDAP_CONNECTION_URL = ldap://localhost:10389
-
-* Used in - <IS_HOME>/repository/conf/user-mgt.xml
-
----
-## Following are the config parameters used for setting up external database
+## Following are the config parameters used for setting up external database 
 #### Set URL
 
     CONFIG_PARAM_URL= jdbc:mysql://localhost:3306/
@@ -145,7 +157,7 @@ CONFIG_PARAM_PAMSWORD=root
 
 ##### Used in 
 
-* < IS_HOME >/repository/conf/user-mgt.xml
-* < IS_HOME >/repository/conf/datasources/master-datasources.xml
-* < IS_HOME >/repository/conf/registry.xml
+* < AM_HOME >/repository/conf/user-mgt.xml
+* < AM_HOME >/repository/conf/datasources/master-datasources.xml
+* < AM_HOME >/repository/conf/registry.xml
 
