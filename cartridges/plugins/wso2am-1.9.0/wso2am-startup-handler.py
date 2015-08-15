@@ -18,11 +18,12 @@
 
 from plugins.contracts import ICartridgeAgentPlugin
 from modules.util.log import LogFactory
-from modules.topology.topologycontext import TopologyContext
+import entity
 import subprocess
 import os
 import mdsclient
 import time
+import socket
 
 
 class WSO2AMStartupHandler(ICartridgeAgentPlugin):
@@ -44,10 +45,15 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
     CONST_GATEWAY = "Gateway"
     CONST_PUBLISHER = "Publisher"
     CONST_STORE = "Store"
+    CONST_KUB_NODE_PORT = "NodePort"
+    CONST_KUB_CLUSTER_IP = "ClusterIP"
     # CONST_SERVICE_KEYMANAGER = "keymanager"
     # CONST_SERVICE_GATEWAY = "gateway"
     # CONST_SERVICE_PUBLISHER = "publisher"
     # CONST_SERVICE_STORE = "store"
+    TOPOLOGY_KUBERNETES_SERVICES = "kubernetesServices"
+    TOPOLOGY_KUBERNETES_SERVICE_PORTNAME = "portName"
+    TOPOLOGY_KUBERNETES_SERVICE_PORTAL_IP = "portalIP"
 
     SERVICES = ["esbworker", "esbmanager", "esb"]
 
@@ -60,6 +66,14 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
     ENV_CONFIG_PARAM_CLUSTERING = 'CONFIG_PARAM_CLUSTERING'
     ENV_CONFIG_PARAM_MEMBERSHIP_SCHEME = 'CONFIG_PARAM_MEMBERSHIP_SCHEME'
     ENV_CONFIG_PARAM_PROFILE = 'CONFIG_PARAM_PROFILE'
+    ENV_CONFIG_PARAM_LOADBALANCER_IP = 'CONFIG_PARAM_LOADBALANCER_IP'
+    ENV_CONFIG_PARAM_KEYMANAGER_IP = 'CONFIG_PARAM_KEYMANAGER_IP'
+    ENV_CONFIG_PARAM_GATEWAY_IP = 'CONFIG_PARAM_GATEWAY_IP'
+    ENV_CONFIG_PARAM_PUBLISHER_IP = 'CONFIG_PARAM_PUBLISHER_IP'
+    ENV_CONFIG_PARAM_STORE_IP = 'CONFIG_PARAM_STORE_IP'
+    ENV_CONFIG_PARAM_THRIFTSERVERHOST = 'CONFIG_PARAM_THRIFTSERVERHOST'
+    ENV_CONFIG_PARAM_WKA_MEMBERS = 'CONFIG_PARAM_WKA_MEMBERS'
+
 
     def run_plugin(self, values):
 
@@ -67,57 +81,70 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
         port_mappings_str = values[self.CONST_PORT_MAPPINGS].replace("'", "")
         app_id = values[self.CONST_APPLICATION_ID]
         mb_ip = values[self.CONST_MB_IP]
-        service_type = values[self.CONST_SERVICE_NAME]
+        service_name = values[self.CONST_SERVICE_NAME]
         profile = os.environ.get(self.ENV_CONFIG_PARAM_PROFILE)
+        load_balancer_ip = os.environ.get(self.ENV_CONFIG_PARAM_LOADBALANCER_IP)
+
         # log above values
         WSO2AMStartupHandler.log.info("Port Mappings: %s" % port_mappings_str)
         WSO2AMStartupHandler.log.info("Application ID: %s" % app_id)
         WSO2AMStartupHandler.log.info("MB IP: %s" % mb_ip)
-        WSO2AMStartupHandler.log.info("Service Name: %s" % service_type)
+        WSO2AMStartupHandler.log.info("Service Name: %s" % service_name)
         WSO2AMStartupHandler.log.info("Profile: %s" % profile)
 
         # export Proxy Ports as Env. variables - used in catalina-server.xml
-        self.set_proxy_ports(port_mappings_str)
+        # self.set_proxy_ports(port_mappings_str)
 
         if profile == self.CONST_KEYMANAGER:
-            gateway_ip = self.configure_profile(service_type, app_id, "CONFIG_PARAM_KEYMANAGER_IP",
-                                                "CONFIG_PARAM_GATEWAY_IP")
-            WSO2AMStartupHandler.log.info("Gateway IP - " + gateway_ip)
-            self.export_env_var("CONFIG_PARAM_GATEWAY_IP", gateway_ip)
+
+            isKubernetes = self.check_for_kubernetes_cluster(service_name, app_id)
+            service_ip = self.configure_service_ip(load_balancer_ip, isKubernetes, service_name, app_id)
+            gateway_ip = self.configure_profile(app_id, self.ENV_CONFIG_PARAM_KEYMANAGER_IP, service_ip,
+                                                self.ENV_CONFIG_PARAM_GATEWAY_IP)
+            self.export_env_var(self.ENV_CONFIG_PARAM_GATEWAY_IP, gateway_ip)
             start_command = "exec ${CARBON_HOME}/bin/wso2server.sh -Dprofile=api-key-manager start"
 
         elif profile == self.CONST_GATEWAY:
-            keymanager_ip = self.configure_profile(service_type, app_id, "CONFIG_PARAM_GATEWAY_IP",
-                                                   "CONFIG_PARAM_KEYMANAGER_IP")
-            WSO2AMStartupHandler.log.info("KeyManager IP - " + keymanager_ip)
-            self.export_env_var("CONFIG_PARAM_KEYMANAGER_IP", keymanager_ip)
-            self.export_env_var("CONFIG_PARAM_THRIFTSERVERHOST", keymanager_ip)
+
+            isKubernetes = self.check_for_kubernetes_cluster(service_name, app_id)
+            service_ip = self.configure_service_ip(load_balancer_ip, isKubernetes, service_name, app_id)
+            keymanager_ip = self.configure_profile(app_id, self.ENV_CONFIG_PARAM_GATEWAY_IP, service_ip,
+                                                   self.ENV_CONFIG_PARAM_KEYMANAGER_IP)
+            self.export_env_var(self.ENV_CONFIG_PARAM_KEYMANAGER_IP, keymanager_ip)
+            self.export_env_var(self.ENV_CONFIG_PARAM_THRIFTSERVERHOST, keymanager_ip)
             start_command = "exec ${CARBON_HOME}/bin/wso2server.sh -Dprofile=gateway-manager start"
+
 
         elif profile == self.CONST_PUBLISHER:
 
-            store_ip = self.configure_profile(service_type, app_id, "CONFIG_PARAM_PUBLISHER_IP",
-                                              "CONFIG_PARAM_STORE_IP")
+            isKubernetes = self.check_for_kubernetes_cluster(service_name, app_id)
+            service_ip = self.configure_service_ip(load_balancer_ip, isKubernetes, service_name, app_id)
+            store_ip = self.configure_profile(app_id, self.ENV_CONFIG_PARAM_PUBLISHER_IP, service_ip,
+                                              self.ENV_CONFIG_PARAM_STORE_IP)
             wka_member_value = "[" + store_ip + ":4000]"
-            self.export_env_var("CONFIG_PARAM_WKA_MEMBERS", wka_member_value)
+            self.export_env_var(self.ENV_CONFIG_PARAM_STORE_IP, store_ip)
+            self.export_env_var(self.ENV_CONFIG_PARAM_WKA_MEMBERS, wka_member_value)
 
-            keymanager_ip = self.get_data_from_meta_data_service(app_id, "CONFIG_PARAM_KEYMANAGER_IP")
-            gateway_ip = self.get_data_from_meta_data_service(app_id, "CONFIG_PARAM_GATEWAY_IP")
-            self.export_env_var("CONFIG_PARAM_KEYMANAGER_IP", keymanager_ip)
-            self.export_env_var("CONFIG_PARAM_GATEWAY_IP", gateway_ip)
+            keymanager_ip = self.get_data_from_meta_data_service(app_id, self.ENV_CONFIG_PARAM_KEYMANAGER_IP)
+            gateway_ip = self.get_data_from_meta_data_service(app_id, self.ENV_CONFIG_PARAM_GATEWAY_IP)
+            self.export_env_var(self.ENV_CONFIG_PARAM_KEYMANAGER_IP, keymanager_ip)
+            self.export_env_var(self.ENV_CONFIG_PARAM_GATEWAY_IP, gateway_ip)
             start_command = "exec ${CARBON_HOME}/bin/wso2server.sh -Dprofile=api-publisher start"
 
         elif profile == self.CONST_STORE:
 
-            publisher_ip = self.configure_profile(service_type, app_id, "CONFIG_PARAM_STORE_IP",
-                                                  "CONFIG_PARAM_PUBLISHER_IP")
+            isKubernetes = self.check_for_kubernetes_cluster(service_name, app_id)
+            service_ip = self.configure_service_ip(load_balancer_ip, isKubernetes, service_name, app_id)
+            publisher_ip = self.configure_profile(app_id, self.ENV_CONFIG_PARAM_STORE_IP, service_ip,
+                                                  self.ENV_CONFIG_PARAM_PUBLISHER_IP)
             wka_member_value = "[" + publisher_ip + ":4000]"
-            self.export_env_var("CONFIG_PARAM_WKA_MEMBERS", wka_member_value)
+            self.export_env_var(self.ENV_CONFIG_PARAM_PUBLISHER_IP, publisher_ip)
+            self.export_env_var(self.ENV_CONFIG_PARAM_WKA_MEMBERS, wka_member_value)
 
-            keymanager_ip = self.get_data_from_meta_data_service(app_id, "CONFIG_PARAM_KEYMANAGER_IP")
-            gateway_ip = self.get_data_from_meta_data_service(app_id, "CONFIG_PARAM_GATEWAY_IP")
-            self.export_env_var("CONFIG_PARAM_KEYMANAGER_IP", keymanager_ip)
-            self.export_env_var("CONFIG_PARAM_GATEWAY_IP", gateway_ip)
+            keymanager_ip = self.get_data_from_meta_data_service(app_id, self.ENV_CONFIG_PARAM_KEYMANAGER_IP)
+            gateway_ip = self.get_data_from_meta_data_service(app_id, self.ENV_CONFIG_PARAM_GATEWAY_IP)
+            self.export_env_var(self.ENV_CONFIG_PARAM_KEYMANAGER_IP, keymanager_ip)
+            self.export_env_var(self.ENV_CONFIG_PARAM_GATEWAY_IP, gateway_ip)
             start_command = "exec ${CARBON_HOME}/bin/wso2server.sh -Dprofile=api-store start"
         else:
             start_command = "exec ${CARBON_HOME}/bin/wso2server.sh start"
@@ -139,11 +166,23 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
         WSO2AMStartupHandler.log.info("WSO2 API Manager started successfully")
 
 
-    def configure_profile(self, service, app_id, publish_property, receive_property):
+    def configure_service_ip(self, service_ip, isKubernetes, service_name, app_id):
+
+        if service_ip is None:
+            if isKubernetes:
+                service_ip = self.read_portal_ip_of_service(service_name, app_id)
+                WSO2AMStartupHandler.log.info("Service IP takes from portalIp")
+            else:
+                service_ip = self.read_member_ip_from_topology(service_name, app_id)
+                WSO2AMStartupHandler.log.info("Service IP takes from topology")
+
+        return service_ip
+
+
+    def configure_profile(self, app_id, publish_property, value, receive_property):
 
         self.remove_data_from_metadata(publish_property)
-        member_ip = self.read_member_ip_from_topology(service, app_id)
-        self.add_values_to_meta_data_service(publish_property, member_ip)
+        self.add_values_to_meta_data_service(publish_property, value)
 
         return self.get_data_from_meta_data_service(app_id, receive_property)
 
@@ -197,9 +236,10 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
             self.export_env_var(self.ENV_CONFIG_PARAM_CLUSTER_IDs, cluster_ids_string)
 
     def read_member_ip_from_topology(self, service_name, app_id):
-        cluster_id = None
         clusters = None
-        topology = TopologyContext().get_topology()
+        topology = entity.TopologyContext().get_topology()
+        members = None
+        member_ip = None
 
         if topology.service_exists(service_name):
             service = topology.get_service(service_name)
@@ -215,6 +255,10 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
         if members is not None:
             for member in members:
                 member_ip = member.member_default_private_ip
+
+        if member_ip is None:
+            server_hostname = socket.gethostname()
+            member_ip = socket.gethostbyname(server_hostname)
 
         return member_ip
 
@@ -238,6 +282,7 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
                     name = name_value_array[0].split(":")[1]
                     protocol = name_value_array[1].split(":")[1]
                     proxy_port = name_value_array[3].split(":")[1]
+
                     # If PROXY_PORT is not set,
                     if proxy_port == "0":
                         proxy_port = name_value_array[2].split(":")[1]
@@ -261,3 +306,48 @@ class WSO2AMStartupHandler(ICartridgeAgentPlugin):
         else:
             WSO2AMStartupHandler.log.warn("Could not export environment variable %s " % variable)
 
+    def read_portal_ip_of_service(self, service_name, app_id):
+
+        clusters = None
+        topology = entity.TopologyContext().get_topology()
+        portalIp_value = None
+
+        if topology.service_exists(service_name):
+            service = topology.get_service(service_name)
+            clusters = service.get_clusters()
+        else:
+            WSO2AMStartupHandler.log.error("[Service] %s is not available in topology" % service_name)
+
+        if clusters is not None:
+            for cluster in clusters:
+                if cluster.app_id == app_id:
+                    kubernetesServices = cluster.get_kubernetesServices()
+
+        if kubernetesServices is not None:
+            for kb_service in kubernetesServices:
+                if kb_service.portName == self.CONST_PORT_MAPPING_MGT_CONSOLE:
+                    portalIp_value = kb_service.portalIP
+        else:
+            WSO2AMStartupHandler.log.error("Kubernetes Services are not available for [Service] %s" % service_name)
+
+        return portalIp_value
+
+
+    def check_for_kubernetes_cluster(self, service_name, app_id):
+
+        isKubernetes = False
+        clusters = None
+        topology = entity.TopologyContext().get_topology()
+
+        if topology.service_exists(service_name):
+            service = topology.get_service(service_name)
+            clusters = service.get_clusters()
+        else:
+            WSO2AMStartupHandler.log.error("[Service] %s is not available in topology" % service_name)
+
+        if clusters is not None:
+            for cluster in clusters:
+                if cluster.app_id == app_id:
+                    isKubernetes = cluster.is_kubernetes_cluster
+
+        return isKubernetes

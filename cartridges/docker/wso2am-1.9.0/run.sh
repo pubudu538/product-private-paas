@@ -42,6 +42,6 @@ startDefaultAMWithMysql() {
 echo "Starting an AM cluster with docker..."
 
 startDefaultAM
-startDefaultAMWithMysql
+#startDefaultAMWithMysql
 
 
