@@ -47,7 +47,7 @@
         },
         {
             "name": "payload_parameter.CONFIG_PARAM_APIMGT_DB_URL",
-            "value": "jdbc:mysql://172.17.42.1:3306"
+            "value": "jdbc:mysql://172.17.8.1:3306/apimgtdb?autoReconnect=true"
         },
         {
             "name": "payload_parameter.CONFIG_PARAM_DB_USER_NAME",
@@ -59,7 +59,7 @@
         },
         {
             "name": "payload_parameter.CONFIG_PARAM_UM_DB_URL",
-            "value": "jdbc:mysql://172.17.42.1:3306"
+            "value": "jdbc:mysql://172.17.42.1:3306/stratos_user_db?autoReconnect=true"
         },
         {
             "name": "payload_parameter.CONFIG_PARAM_KEYVALIDATORCLIENTTYPE",
