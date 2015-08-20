@@ -282,11 +282,7 @@
         <parameter name="port" locked="false">8280</parameter>
         <parameter name="non-blocking" locked="false">true</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter-->
-        {% if CONFIG_PARAM_SUB_DOMAIN == 'mgt' and CONFIG_PARAM_PT_HTTP_PROXY_PORT is defined -%}
-            <parameter name="WSDLEPRPrefix" locked="false">http://{{ CONFIG_PARAM_WORKER_HOST_NAME }}:{{ CONFIG_PARAM_PT_HTTP_PROXY_PORT }}</parameter>
-        {% else -%}
-            <!--parameter name="WSDLEPRPrefix" locked="false">http://apachehost:port/somepath</parameter-->
-        {% endif -%}
+        <!--parameter name="WSDLEPRPrefix" locked="false">http://apachehost:port/somepath</parameter-->        
         <parameter name="httpGetProcessor" locked="false">org.wso2.carbon.transport.nhttp.api.PassThroughNHttpGetProcessor</parameter>
         <!--<parameter name="priorityConfigFile" locked="false">location of priority configuration file</parameter>-->
     </transportReceiver>
@@ -305,11 +301,7 @@
         <parameter name="port" locked="false">8243</parameter>
         <parameter name="non-blocking" locked="false">true</parameter>
         <!--parameter name="bind-address" locked="false">hostname or IP address</parameter--> 
-        {% if CONFIG_PARAM_SUB_DOMAIN == 'mgt' and CONFIG_PARAM_PT_HTTPS_PROXY_PORT is defined -%}
-                <parameter name="WSDLEPRPrefix" locked="false">https://{{ CONFIG_PARAM_WORKER_HOST_NAME }}:{{ CONFIG_PARAM_PT_HTTPS_PROXY_PORT }}</parameter>
-        {% else -%}
-                <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->
-        {% endif -%}
+        <!--parameter name="WSDLEPRPrefix" locked="false">https://apachehost:port/somepath</parameter-->        
         <parameter name="httpGetProcessor" locked="false">org.wso2.carbon.transport.nhttp.api.PassThroughNHttpGetProcessor</parameter>
         <parameter name="keystore" locked="false">
             <KeyStore>
@@ -655,6 +647,10 @@
                     Service (GMS) using a TCP ping mechanism.
         -->
         <parameter name="membershipScheme">{{CONFIG_PARAM_MEMBERSHIP_SCHEME}}</parameter>
+        <!-- private-paas membership scheme specific parameters -->
+        
+        <parameter name="membershipSchemeClassName">org.wso2.carbon.ppaas.PrivatePaaSBasedMembershipScheme</parameter>
+        <parameter name="clusterIds">{{CONFIG_PARAM_CLUSTER_IDs}}</parameter>
         <!--<parameter name="licenseKey">xxx</parameter>-->
         <!--<parameter name="mgtCenterURL">http://localhost:8081/mancenter/</parameter>-->
 
@@ -716,14 +712,23 @@
             <property name="backendServerURL" value="https://${hostName}:${httpsPort}/services/"/>
             <property name="mgtConsoleURL" value="https://${hostName}:${httpsPort}/"/>
             {% if CONFIG_PARAM_SUB_DOMAIN == 'mgt' %}
+
                 {% if CONFIG_PARAM_PT_HTTP_PROXY_PORT is defined -%}
-                    <property name="port.mapping.8280" value="{{CONFIG_PARAM_PT_HTTP_PROXY_PORT}}"/>
+                    <property name="port.mapping.80" value="{{CONFIG_PARAM_PT_HTTP_PROXY_PORT}}"/>
+                {% else -%}
+                    <property name="port.mapping.80" value="9763"/>
                 {% endif -%}
+
                 {% if CONFIG_PARAM_PT_HTTPS_PROXY_PORT is defined -%}
-                    <property name="port.mapping.8243" value="{{CONFIG_PARAM_PT_HTTPS_PROXY_PORT}}"/>
+                    <property name="port.mapping.443" value="{{CONFIG_PARAM_PT_HTTPS_PROXY_PORT}}"/>
+                {% else -%}
+                    <property name="port.mapping.443" value="9443"/>
                 {% endif -%}
+
                     <property name="subDomain" value="mgt"/>
             {% endif %}
+
+          
 
         <!-- Worker Setup-->
         {% if CONFIG_PARAM_SUB_DOMAIN == 'worker' %}

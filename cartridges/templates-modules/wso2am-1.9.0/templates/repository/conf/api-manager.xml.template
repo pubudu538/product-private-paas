@@ -246,7 +246,7 @@
             Server URL of the API key manager
         -->
 
-        {% if CONFIG_PARAM_PROFILE == 'Gateway' or CONFIG_PARAM_PROFILE == 'Publisher' or CONFIG_PARAM_PROFILE == 'Store' -%}
+        {% if CONFIG_PARAM_PROFILE == 'Gateway-Manager' or CONFIG_PARAM_PROFILE == 'Gateway-Worker' or CONFIG_PARAM_PROFILE == 'Publisher' or CONFIG_PARAM_PROFILE == 'Store' -%}
         <ServerURL>https://{{CONFIG_PARAM_KEYMANAGER_IP}}:9443/services/</ServerURL>            
         {% else -%}
         <ServerURL>https://${carbon.local.ip}:${mgt.transport.https.port}${carbon.context}/services/</ServerURL>
