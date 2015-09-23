@@ -1,0 +1,16 @@
+{
+    "name": "zookeeper-group",
+    "cartridges": [
+        "zookeeper"
+    ],
+    "dependencies": {
+        "terminationBehaviour": "terminate-none",
+        "startupOrders": [
+            {
+                "aliases": [
+                    "cartridge.my-zookeeper"
+                ]
+            }
+        ]
+    }
+}

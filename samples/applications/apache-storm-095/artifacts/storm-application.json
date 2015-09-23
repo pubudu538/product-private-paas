@@ -1,0 +1,54 @@
+{
+    "applicationId": "storm-application",
+    "alias": "my-storm-application",
+    "components": {
+        "groups": [
+            {
+                "name": "storm-group",
+                "alias": "my-storm-group",
+                "deploymentPolicy": "deployment-policy-1",
+                "groupMinInstances": 1,
+                "groupMaxInstances": 1,
+                "cartridges": [
+                    {
+                        "type": "storm-supervisor",
+                        "cartridgeMin": 4,
+                        "cartridgeMax": 4,
+                        "subscribableInfo": {
+                            "alias": "my-storm-supervisor",
+                            "autoscalingPolicy": "autoscaling-policy-1"
+                        }
+                    },
+                    {
+                        "type": "storm-nimbus",
+                        "cartridgeMin": 1,
+                        "cartridgeMax": 1,
+                        "subscribableInfo": {
+                            "alias": "my-storm-nimbus",
+                            "autoscalingPolicy": "autoscaling-policy-1"
+                        }
+                    },
+                    {
+                        "type": "storm-ui",
+                        "cartridgeMin": 1,
+                        "cartridgeMax": 1,
+                        "subscribableInfo": {
+                            "alias": "my-storm-ui",
+                            "autoscalingPolicy": "autoscaling-policy-1"
+                        }
+                    },
+                    {
+                        "type": "zookeeper",
+                        "cartridgeMin": 3,
+                        "cartridgeMax": 3,
+                        "subscribableInfo": {
+                            "alias": "my-zookeeper",
+                            "autoscalingPolicy": "autoscaling-policy-1"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}
+

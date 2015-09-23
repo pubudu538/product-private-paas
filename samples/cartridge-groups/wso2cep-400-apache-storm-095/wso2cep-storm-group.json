@@ -1,0 +1,77 @@
+{
+    "name":"wso2cep-storm-group",
+    "dependencies":{
+        "terminationBehaviour":"terminate-none",
+        "startupOrders":[
+            {
+                "aliases":[
+                    "group.my-zookeeper-group",
+                    "group.my-storm-group",
+                    "group.my-wso2cep-group"
+                ]
+            }
+        ]
+    },
+    "groups":[
+        {
+            "name": "zookeeper-group",
+            "cartridges": [
+                "zookeeper"
+            ],
+            "dependencies": {
+                "terminationBehaviour": "terminate-none",
+                "startupOrders": [
+                    {
+                        "aliases": [
+                            "cartridge.my-zookeeper"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "storm-group",
+            "cartridges": [
+                "storm-supervisor",
+                "storm-ui",
+                "storm-nimbus"
+            ],
+            "dependencies": {
+                "terminationBehaviour": "terminate-dependents",
+                "startupOrders": [
+                    {
+                        "aliases": [
+                            "cartridge.my-storm-nimbus",
+                            "cartridge.my-storm-ui"
+                        ]
+                    },
+                    {
+                        "aliases": [
+                            "cartridge.my-storm-nimbus",
+                            "cartridge.my-storm-supervisor"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "wso2cep-group",
+            "cartridges": [
+                "wso2cep-manager",
+                "wso2cep-worker"
+            ],
+            "dependencies": {
+                "terminationBehaviour": "terminate-none",
+                "startupOrders": [
+                    {
+                        "aliases": [
+                            "cartridge.my-wso2cep-manager",
+                            "cartridge.my-wso2cep-worker"
+                        ]
+                    }
+                ]
+            }
+        }
+
+    ]
+}
