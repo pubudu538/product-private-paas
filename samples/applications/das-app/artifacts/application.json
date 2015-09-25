@@ -82,15 +82,15 @@
                     "alias": "das-receiver-mgt",
                     "privateRepo": true,
                     "repoUrl": "https://github.com/pubudu538/das-depsync.git",
-                    "repoUsername": "####",
-                    "repoPassword": "####"
+                    "repoUsername": "$$$$$",
+                    "repoPassword": "$$$$$"
                   }
                 }
               },
               {
                 "type": "das-receiver",
-                "cartridgeMin": 2,
-                "cartridgeMax": 2,
+                "cartridgeMin": 4,
+                "cartridgeMax": 4,
                 "subscribableInfo": {
                   "alias": "das-receivers-grp",
                   "deploymentPolicy": "deployment-policy-1",
@@ -101,8 +101,8 @@
                     "alias": "das-receivers-grp",
                     "privateRepo": true,
                     "repoUrl": "https://github.com/pubudu538/das-depsync.git",
-                    "repoUsername": "#####",
-                    "repoPassword": "######"
+                    "repoUsername": "$$$$",
+                    "repoPassword": "$$$$"
                   }
                 }
               }
@@ -174,8 +174,8 @@
               },
               {
                 "type": "hadoopdata",
-                "cartridgeMin": 3,
-                "cartridgeMax": 3,
+                "cartridgeMin": 4,
+                "cartridgeMax": 4,
                 "subscribableInfo": {
                   "alias": "hadoop-dn",
                   "deploymentPolicy": "deployment-policy-1",

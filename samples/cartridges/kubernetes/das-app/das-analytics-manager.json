@@ -34,11 +34,11 @@
 	"property": [
 		{
 			"name": "KUBERNETES_CONTAINER_CPU",
-			"value": "0"
+			"value": "2"
 		},
 		{
 			"name": "KUBERNETES_CONTAINER_MEMORY",
-			"value": "0"
+			"value": "4Gi"
 		},
 		{
 			"name": "KUBERNETES_SERVICE_SESSION_AFFINITY",
@@ -62,7 +62,7 @@
 		},
 		{
 			"name": "payload_parameter.CONFIG_PARAM_WSO2_ANALYTICS_WSO2_ANALYTICS_FS_DB_URL",
-			"value": "jdbc:mysql://162.209.78.160:3306/ANALYTICS_FS_DB?autoReconnect=true"
+			"value": "jdbc:mysql://172.31.17.94:3306/ANALYTICS_FS_DB?autoReconnect=true"
 		},
 		{
 			"name": "payload_parameter.CONFIG_PARAM_WSO2_ANALYTICS_WSO2_ANALYTICS_FS_DB_USER_NAME",
@@ -74,7 +74,7 @@
 		},
 		{
 			"name": "payload_parameter.CONFIG_PARAM_WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB_URL",
-			"value": "jdbc:mysql://162.209.78.160:3306/ANALYTICS_PROCESSED_DATA_STORE?autoReconnect=true"
+			"value": "jdbc:mysql://172.31.17.94:3306/ANALYTICS_PROCESSED_DATA_STORE?autoReconnect=true"
 		},
 		{
 			"name": "payload_parameter.CONFIG_PARAM_WSO2_ANALYTICS_PROCESSED_DATA_STORE_DB_USER_NAME",
@@ -86,7 +86,7 @@
 		},
 		{
 			"name": "payload_parameter.CONFIG_PARAM_LOCAL_REGISTRY_DB_URL",
-			"value": "jdbc:mysql://162.209.78.160:3306/DAS_REG?autoReconnect=true"
+			"value": "jdbc:mysql://172.31.17.94:3306/DAS_REG?autoReconnect=true"
 		},
 		{
 			"name": "payload_parameter.CONFIG_PARAM_LOCAL_REGISTRY_DB_USER_NAME",
@@ -97,12 +97,20 @@
 			"value": "root"
 		},
 		{
-			"name": "payload_parameter.CONFIG_PARAM_MEMBERSHIP_SCHEME",
-			"value": "wka"
-		},
-		{
 			"name": "payload_parameter.CONFIG_PARAM_CARBON_SPARK_MASTER_COUNT",
 			"value": "1"
+		},
+	        {
+		    "name": "payload_parameter.CONFIG_PARAM_XMS",
+		    "value": "1024m"
+		},
+		{
+		    "name": "payload_parameter.CONFIG_PARAM_XMX",
+		    "value": "4096m"
+		},
+		{
+		    "name": "payload_parameter.CONFIG_PARAM_MAX_PERM_SIZE",
+		    "value": "1024m"
 		}
 	]
 }
